@@ -1,21 +1,29 @@
 #!/usr/bin/env python3
-
 """
-This module defines the function `task_wait_random` which creates an asyncio task 
-for the `wait_random` coroutine and returns it as an asyncio.Task object.
+Defines runtime of an asynchronous function.
 """
-
+import time
 import asyncio
-from wait_random import wait_random  # Import wait_random from the previous file
 
-def task_wait_random(max_delay: int) -> asyncio.Task:
+# Import wait_n from the previous task
+wait_n = __import__('1-concurrent_coroutines').wait_n
+
+
+def measure_time(n: int, max_delay: int) -> float:
     """
-    Creates an asyncio.Task to execute the wait_random coroutine.
+    Measures the time it takes to execute `wait_n` n times with the specified max_delay.
 
     Args:
-        max_delay (int): The maximum delay for the wait_random coroutine.
+        n (int): The number of times to spawn the wait_random coroutine.
+        max_delay (int): The maximum delay to be passed to the wait_random coroutine.
 
     Returns:
-        asyncio.Task: The task representing the wait_random coroutine.
+        float: The average time taken per coroutine execution in seconds.
     """
-    return asyncio.create_task(wait_random(max_delay))
+    start: float = time.time()  # Capture the start time
+    asyncio.run(wait_n(n, max_delay))  # Run the wait_n coroutine
+    end: float = time.time()  # Capture the end time
+    total_time: float = end - start  # Calculate the total execution time
+    
+    # Return the average time per coroutine
+    return total_time / n  # Return average execution time per coroutine
