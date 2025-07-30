@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
-''' async and await syntax '''
+""" Tasks """
 import asyncio
+from typing import List
 
-# Import wait_random from the previous task
-wait_random = __import__('0-basic_async_syntax').wait_random
+# Import the task_wait_random function from 3-tasks.py
+task_wait_random = __import__('3-tasks').task_wait_random
 
-def task_wait_random(max_delay: int) -> asyncio.Task:
-    '''
-    Function that returns an asyncio Task, which will execute the wait_random coroutine.
-    
+
+async def task_wait_n(n: int, max_delay: int) -> List[float]:
+    """ Asynchronously runs task_wait_random n times and returns the sorted list of delays.
+
     Args:
-        max_delay (int): The maximum delay for the wait_random coroutine.
+        n (int): Number of coroutines to spawn.
+        max_delay (int): The maximum delay for each wait_random coroutine.
 
     Returns:
-        asyncio.Task: The task that will run the wait_random coroutine.
-    '''
-    # Create and return an asyncio Task for wait_random
-    task: asyncio.Task = asyncio.create_task(wait_random(max_delay))
-    return task
+        List[float]: A list of all delays, sorted in ascending order.
+    """
+    # Create a list of tasks
+    tasks = [task_wait_random(max_delay) for _ in range(n)]
+    
+    # Collect results from tasks as they complete, sorted in the order they are completed
+    delays = [await task for task in asyncio.as_completed(tasks)]
+    
+    return delays
