@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+This module defines a coroutine `wait_random` that waits for a random delay
+between 0 and `max_delay` (inclusive) and returns the delay in seconds.
+"""
+
 import asyncio
 import random
 
