@@ -1,29 +1,20 @@
 #!/usr/bin/env python3
-"""
-Defines runtime of an asynchronous function.
-"""
-import time
+''' async and await syntax '''
 import asyncio
-from typing import Callable
 
-# Import wait_n from the previous task
-wait_n = __import__('1-concurrent_coroutines').wait_n
+# Import wait_random from the previous task
+wait_random = __import__('0-basic_async_syntax').wait_random
 
-def measure_time(n: int, max_delay: int) -> float:
-    """
-    Measures the time it takes to execute `wait_n` n times with the specified max_delay.
-
+def task_wait_random(max_delay: int) -> asyncio.Task:
+    '''
+    Function that returns an asyncio Task, which will execute the wait_random coroutine.
+    
     Args:
-        n (int): The number of coroutines to spawn.
-        max_delay (int): The maximum delay to be passed to `wait_random`.
+        max_delay (int): The maximum delay for the wait_random coroutine.
 
     Returns:
-        float: The average time taken per coroutine execution in seconds.
-    """
-    start: float = time.time()  # Capture the start time
-    asyncio.run(wait_n(n, max_delay))  # Run the wait_n coroutine
-    end: float = time.time()  # Capture the end time
-    total_time: float = end - start  # Calculate the total execution time
-    
-    # Return the average time per coroutine
-    return total_time / n  # Return average execution time per coroutine
+        asyncio.Task: The task that will run the wait_random coroutine.
+    '''
+    # Create and return an asyncio Task for wait_random
+    task: asyncio.Task = asyncio.create_task(wait_random(max_delay))
+    return task
