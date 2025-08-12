@@ -1,0 +1,5 @@
+// Update all documents with name="Holberton school" and add the "address" field
+db.school.updateMany(
+    { "name": "Holberton school" },  // Filter to match documents
+    { $set: { "address": "972 Mission street" } }  // Update the "address" field
+)
