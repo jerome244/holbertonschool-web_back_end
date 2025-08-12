@@ -9,7 +9,8 @@ from typing import List, Dict
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -17,45 +18,50 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset"""
+        """Cached dataset
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]  # Skip the header
+            self.__dataset = dataset[1:]
+
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """Dataset indexed by sorting position, starting at 0"""
+        """Dataset indexed by sorting position, starting at 0
+        """
         if self.__indexed_dataset is None:
             dataset = self.dataset()
-            self.__indexed_dataset = {i: dataset[i] for i in range(len(dataset))}
+            truncated_dataset = dataset[:1000]
+            self.__indexed_dataset = {
+                i: dataset[i] for i in range(len(dataset))
+            }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = 0, page_size: int = 10) -> Dict:
-        """Returns a page of data, considering possible deletions"""
-        
-        # Ensure that the index is within the valid range
-        assert isinstance(index, int) and index >= 0, "Index must be a non-negative integer."
-        
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+        """hyper index method
+
+        Args:
+            index (int, optional): Index of element. Defaults to None.
+            page_size (int, optional): Size of the page. Defaults to 10.
+
+        Returns:
+            Dict: dictionary with a key-value pairs
+        """
+        assert(type(index) == int and type(page_size) == int)
+        assert(0 <= index < len(self.dataset()))
         dataset = self.indexed_dataset()
-
-        # Initialize variables to collect the page data
-        page_data = []
-        current_index = index
-
-        # Collect data, skipping over deleted items
-        while len(page_data) < page_size and current_index < len(dataset):
-            if current_index in dataset:
-                page_data.append(dataset[current_index])
-            current_index += 1
-
-        # Determine the next index for the following page
-        next_index = current_index if current_index < len(dataset) else None
-
+        data = []
+        next_index = index
+        for _ in range(page_size):
+            while not dataset.get(next_index):
+                next_index += 1
+            data.append(dataset.get(next_index))
+            next_index += 1
         return {
             'index': index,
-            'data': page_data,
+            'next_index': next_index,
             'page_size': page_size,
-            'next_index': next_index
+            'data': data
         }

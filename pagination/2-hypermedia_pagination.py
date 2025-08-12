@@ -1,83 +1,65 @@
 #!/usr/bin/env python3
+"""Hypermedia pagination"""
+
 import csv
 import math
-from typing import List
-
-
-def index_range(page: int, page_size: int) -> tuple:
-    """
-    Returns a tuple containing the start and end index for the 
-    given page and page_size.
-
-    Parameters:
-    page (int): The page number (1-indexed).
-    page_size (int): The number of items per page.
-
-    Returns:
-    tuple: A tuple containing the start and end index.
-    """
-    start_index = (page - 1) * page_size
-    end_index = start_index + page_size
-    return (start_index, end_index)
+from typing import Dict, List
+index_range = __import__('0-simple_helper_function').index_range
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
         self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset"""
+        """Cached dataset
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]  # Skip the header
+            self.__dataset = dataset[1:]
+
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """Returns a page of data from the dataset based on page and page_size."""
+        """Gets page list of records
 
-        # Assert that page and page_size are positive integers
-        assert isinstance(page, int) and page > 0, "Page must be a positive integer."
-        assert isinstance(page_size, int) and page_size > 0, "Page size must be a positive integer."
+        Args:
+            page (int, optional): Number of page. Defaults to 1.
+            page_size (int, optional):
+            Size of elements in page. Defaults to 10.
 
-        # Get the dataset
-        dataset = self.dataset()
+        Returns:
+            List[List]: List of elements in a page
+        """
+        assert(type(page_size) == int and type(page) == int)
+        assert(page > 0 and page_size > 0)
+        beginning, end = index_range(page, page_size)
+        return self.dataset()[beginning:end]
 
-        # Calculate the start and end index using index_range
-        start_index, end_index = index_range(page, page_size)
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
+        """get hyper
 
-        # If the requested page is out of range, return an empty list
-        if start_index >= len(dataset):
-            return []
-        
-        # Return the sliced dataset page
-        return dataset[start_index:end_index]
+        Args:
+            page (int, optional): current page. Defaults to 1.
+            page_size (int, optional):
+            Number of elements in page. Defaults to 10.
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
-        """Returns a dictionary containing pagination information and the dataset page."""
-        
-        # Get the dataset page using get_page
-        data = self.get_page(page, page_size)
-        
-        # Total number of items in the dataset
-        total_items = len(self.dataset())
-        
-        # Total number of pages
-        total_pages = math.ceil(total_items / page_size)
-        
-        # Determine the next and previous pages
-        next_page = page + 1 if page < total_pages else None
-        prev_page = page - 1 if page > 1 else None
-        
-        return {
-            'page_size': len(data),
-            'page': page,
-            'data': data,
-            'next_page': next_page,
-            'prev_page': prev_page,
-            'total_pages': total_pages
+        Returns:
+            Dict: Dictonary of pagination elements
+        """
+        total_pages = math.ceil(len(self.dataset()) / page_size)
+        new_dictionary = {
+            "page_size": page_size,
+            "page": page,
+            "data": self.get_page(page, page_size),
+            "next_page": page + 1 if page < total_pages else None,
+            "prev_page": page - 1 if page > 1 else None,
+            "total_pages": total_pages
         }
+        return new_dictionary
