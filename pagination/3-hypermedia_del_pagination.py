@@ -39,20 +39,20 @@ class Server:
         assert isinstance(index, int) and index >= 0, "Index must be a non-negative integer."
         
         dataset = self.indexed_dataset()
-        
-        # Initialize variables
+
+        # Initialize variables to collect the page data
         page_data = []
         current_index = index
-        
-        # Collect page data by skipping over deleted entries
+
+        # Collect data, skipping over deleted items
         while len(page_data) < page_size and current_index < len(dataset):
             if current_index in dataset:
                 page_data.append(dataset[current_index])
             current_index += 1
-        
+
         # Determine the next index for the following page
         next_index = current_index if current_index < len(dataset) else None
-        
+
         return {
             'index': index,
             'data': page_data,

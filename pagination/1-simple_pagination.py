@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import csv
+import math
 from typing import List
-from math import ceil
 
-# Helper function to calculate start and end index
+
 def index_range(page: int, page_size: int) -> tuple:
     """
     Returns a tuple containing the start and end index for the 
@@ -20,6 +20,7 @@ def index_range(page: int, page_size: int) -> tuple:
     end_index = start_index + page_size
     return (start_index, end_index)
 
+
 class Server:
     """Server class to paginate a database of popular baby names."""
     DATA_FILE = "Popular_Baby_Names.csv"
@@ -28,7 +29,7 @@ class Server:
         self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Caches the dataset from the CSV file."""
+        """Cached dataset"""
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -38,18 +39,20 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """Returns a page of data from the dataset based on page and page_size."""
-        
-        # Validate the input values
+
+        # Assert that page and page_size are positive integers
         assert isinstance(page, int) and page > 0, "Page must be a positive integer."
         assert isinstance(page_size, int) and page_size > 0, "Page size must be a positive integer."
-        
+
         # Get the dataset
         dataset = self.dataset()
-        
-        # Get the start and end index for pagination
+
+        # Calculate the start and end index using index_range
         start_index, end_index = index_range(page, page_size)
-        
-        # Return the appropriate page of data or an empty list if the range is out of bounds
+
+        # If the requested page is out of range, return an empty list
         if start_index >= len(dataset):
             return []
+        
+        # Return the sliced dataset page
         return dataset[start_index:end_index]
