@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 1"""
+"""Simple pagination"""
 import csv
 import math
 from typing import List
@@ -25,12 +25,18 @@ class Server:
 
         return self.__dataset
 
-    def get_page(self, page=1, page_size=10):
-        """getting page"""
-        assert isinstance(page, int) and isinstance(page_size, int)
-        assert page > 0 and page_size > 0
-        start_index, end_index = index_range(page, page_size)
-        if start_index < len(self.dataset()):
-            return self.__dataset[start_index:end_index]
-        else:
-            return []
+    def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
+        """Gets page list of records
+
+        Args:
+            page (int, optional): Number of page. Defaults to 1.
+            page_size (int, optional):
+            Size of elements in page. Defaults to 10.
+
+        Returns:
+            List[List]: List of elements in a page
+        """
+        assert(type(page_size) == int and type(page) == int)
+        assert(page > 0 and page_size > 0)
+        beginning, end = index_range(page, page_size)
+        return self.dataset()[beginning:end]
