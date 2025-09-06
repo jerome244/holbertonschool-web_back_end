@@ -70,11 +70,9 @@ const app = http.createServer((req, res) => {
         res.statusCode = 200;
         res.end('This is the list of our students\nCannot load the database');
       });
-
     return;
   }
 
-  // Default fallback (still plain text)
   res.statusCode = 404;
   res.end('Not found');
 });
